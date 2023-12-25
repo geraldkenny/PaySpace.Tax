@@ -1,0 +1,108 @@
+﻿@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="text-center">
+    <h1> Welcome To PaySpace Tax Calculation</h1>
+
+</div>
+
+<form class="form-horizontal" id="taxCalculationForm">
+
+    <div class="form-group">
+        <label class="control-label col-sm-2" for="postalCode">Postal Code:</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="postalCode" name="postalCode" placeholder="Enter Postal Code" required>
+            <small id="postalVal" style="color:red">Field is required!</small>
+        </div>
+    </div>
+    <br />
+    <div class="form-group">
+        <label class="control-label col-sm-2" for="annualIncome">Annual Income:</label>
+        <div class="col-sm-10">
+            <input type="number" class="form-control" id="annualIncome" name="annualIncome" placeholder="Enter Annual Income" required>
+            <small id="annualIncomeVal" style="color:red">Field is required!</small>
+        </div>
+    </div>
+
+    <br />
+
+    <button id="spinner" class="btn btn-primary" type="button" disabled>
+        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        <span class="sr-only">Loading...</span>
+    </button>
+  
+    <button type="submit" class="btn btn-primary" id="calculateBtn">Calculate</button>
+  
+</form>
+
+@section Scripts {
+    <script>
+
+        $(document).ready(function () {
+
+            $("#spinner").hide();
+            $("#postalVal").hide();
+            $("#annualIncomeVal").hide();
+
+            $(function () {
+
+                let calculateBtn = $('#calculateBtn');
+                let form = $('#taxCalculationForm');
+
+                calculateBtn.click(function (e) {
+                    e.preventDefault();
+
+                    let annualIncome = $("#annualIncome").val();
+                    let postalCode = $("#postalCode").val();
+
+                    if (annualIncome == "") {
+                        $("#annualIncomeVal").show();
+                    }
+
+                    if (postalCode == "") {
+                        $("#postalVal").show();
+                    }
+
+                    if (annualIncome == "" || postalCode == "") {
+                        return;
+                    }
+
+                    calculateBtn.hide();
+
+                    $("#spinner").show();
+
+                    let userInput = { annualIncome: annualIncome, postalCode: postalCode }
+
+                    CalculateTax(userInput);
+                });
+
+            });
+
+            function CalculateTax($data) {
+                $.ajax({
+                    url: "/api/v1/Tax/Calculate",
+                    contentType: "application/json",
+                    method: "POST",
+                    data: JSON.stringify($data)
+                }).done(function ($response) {
+                    if ($response === undefined) {
+                        alert("unable to calculate please try again");
+                        return;
+                    }
+                    alert(`Your tax is ${$response.responseMessage}`);
+                }).fail(function ($error) 
+                {
+                    let error = $error.responseJSON.responseMessage;
+                    alert(error);
+                }).always(function ($always) {
+                    $("#spinner").hide();
+                    $("#calculateBtn").show();
+
+                    $('#taxCalculationForm')[0].reset();
+                });
+            }
+
+        });
+    </script>
+}

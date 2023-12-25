@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\PaySpace.Tax.Domain\PaySpace.Tax.Domain.csproj" />
+    <ProjectReference Include="..\PaySpace.Tax.Infrastructure\PaySpace.Tax.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
